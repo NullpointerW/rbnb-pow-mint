@@ -31,5 +31,5 @@ func genWallet() (address, pk string) {
 	// 从公钥生成以太坊地址
 	address = crypto.PubkeyToAddress(*publicKeyECDSA).Hex()
 	fmt.Println("Address:", address)
-	return address[2:], pk
+	return address[2:], privateKeyHex
 }
