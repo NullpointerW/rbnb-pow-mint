@@ -10,6 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	log "github.com/sirupsen/logrus"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"runtime"
@@ -26,6 +27,7 @@ var (
 	Prefix     string
 	Challenge  string
 	HexAddress string
+	HttpClient *http.Client
 )
 
 func init() {
@@ -43,12 +45,21 @@ func init() {
 	if err != nil {
 		return
 	}
+	//HttpClient = SSClient(&http.Client{Timeout: time.Second})
+	HttpClient = &http.Client{Timeout: time.Second}
 }
 
 func main() {
 	url := fmt.Sprintf(BalanceAPI, HexAddress)
 	minted := uint64(0)
-	resp, err := http.Get(url)
+	//tp := &http.Transport{
+	//	DialContext: Dialer.NewConn,
+	//}
+	client := &http.Client{
+		Timeout: time.Millisecond * 20000,
+		//Transport: tp,
+	}
+	resp, err := client.Get(url)
 	if err != nil {
 		fmt.Println("query balance error", err)
 	} else {
@@ -120,7 +131,13 @@ func WritePk(addr, pk string) {
 }
 
 func sendTX(body string) {
-	client := &http.Client{}
+	//tp := &http.Transport{
+	//	DialContext: Dialer.NewConn,
+	//}
+	//client := &http.Client{
+	//	Timeout: time.Millisecond * 1000,
+	//Transport: tp,
+	//}
 	var data = strings.NewReader(body)
 	req, err := http.NewRequest("POST", "https://ec2-18-217-135-255.us-east-2.compute.amazonaws.com/validate", data)
 	if err != nil {
@@ -131,9 +148,14 @@ func sendTX(body string) {
 	req.Header.Set("origin", "https://bnb.reth.cc")
 	req.Header.Set("referer", "https://bnb.reth.cc/")
 	req.Header.Set("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
-	resp, err := client.Do(req)
+	resp, err := HttpClient.Do(req)
 	if err != nil {
-		log.Error(err)
+		if strings.Contains(strings.ToLower(err.Error()), "timeout") {
+			MintCount.Add(1)
+			log.Info("MINT成功")
+		} else {
+			log.Error(err)
+		}
 		return
 	}
 
@@ -188,5 +210,51 @@ func makeTx() {
 		log.WithFields(log.Fields{"Solution": hashedSolution}).Info("找到新ID")
 		body := fmt.Sprintf(`{"solution": "0x%s", "challenge": "0x%s", "address": "%s", "difficulty": "%s", "tick": "%s"}`, potentialSolution, Challenge, strings.ToLower(HexAddress), Prefix, "rBNB")
 		sendTX(body)
+	}
+}
+
+type ApiResponse struct {
+	Address string `json:"address"`
+	Balance int    `json:"balance"`
+}
+
+func getBalance(address string) int {
+	client := &http.Client{}
+	url := "https://ec2-18-217-135-255.us-east-2.compute.amazonaws.com/balance?address=" + address
+
+	for {
+		req, err := http.NewRequest("GET", url, nil)
+		if err != nil {
+			log.Println("创建余额请求失败:", err)
+			continue // 继续尝试
+		}
+
+		resp, err := client.Do(req)
+		if err != nil {
+			log.Println("请求余额失败，正在重试:", err)
+			continue // 继续尝试
+		}
+
+		body, err := ioutil.ReadAll(resp.Body)
+		resp.Body.Close()
+		if err != nil {
+			log.Println("读取余额响应体失败:", err)
+			continue // 继续尝试
+		}
+
+		var response ApiResponse
+		err = json.Unmarshal(body, &response)
+		if err != nil {
+			log.Println("解析余额 JSON 失败:", err)
+			continue // 继续尝试
+		}
+		fmt.Println(string(body))
+		// 检查响应是否包含预期的字段
+		if response.Address == "" {
+			log.Println("响应格式不符合预期，继续重试")
+			continue // 继续尝试
+		}
+
+		return response.Balance
 	}
 }
