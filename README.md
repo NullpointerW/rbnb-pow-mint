@@ -12,7 +12,11 @@ go build
 cd to project folder with dockerfile
 ```bash
 docker build -t rbnb-pow-mint .
-docker run -it rbnb-pow-mint
+```
+
+Optional: Run the container with limited computational resource.
+```bash
+docker run -it -m 50g --cpus=20 rbnb-pow-mint
 ```
 
 ## usage
