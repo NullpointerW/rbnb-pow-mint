@@ -40,11 +40,11 @@ func init() {
 	}
 	Prefix = os.Getenv("diff")
 	// disable on gpu mint
-	//err = MakeDifficulty(Prefix)
-	//if err != nil {
-	//	fmt.Println("invalid diffPrefix", err)
-	//	os.Exit(1)
-	//}
+	err = MakeDifficulty(Prefix)
+	if err != nil {
+		fmt.Println("invalid diffPrefix", err)
+		os.Exit(1)
+	}
 	BalanceApi = os.Getenv("balanceUrl")
 	MintApi = os.Getenv("mintUrl")
 	Challenge = os.Getenv("challenge")
