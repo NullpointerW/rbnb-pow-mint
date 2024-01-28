@@ -74,7 +74,7 @@ func init() {
 	Wallets = LoadWallets("wallet.json")
 	Address = strings.ToLower(Wallets[len(Wallets)-1].Addr)
 	HexAddress = "0x" + Address
-	HttpClient = SSClientYaml(&http.Client{Timeout: 10 * time.Second})
+	HttpClient = (&http.Client{Timeout: 10 * time.Second})
 }
 
 func main() {

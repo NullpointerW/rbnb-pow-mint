@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-var BalanceClient = SSClientYaml(&http.Client{Timeout: 20 * time.Second})
+var BalanceClient = (&http.Client{Timeout: 20 * time.Second})
 var BalanceApi string
 
 type ApiResponse struct {

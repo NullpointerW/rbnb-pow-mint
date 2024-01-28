@@ -21,7 +21,8 @@ docker run -it -m 50g --cpus=20 rbnb-pow-mint
 
 ## usage
 1. Configure the `.env` file.
-2. When each wallet reaches the specified limit, it will automatically generate a new wallet to continue mining. The wallet private keys are saved in the 'wal.txt' directory.
+2. When each wallet reaches the specified limit, it will automatically generate a new wallet to continue mining. 
+3. The wallet private keys are saved in the `wallet.json` directory.
 
 
 
