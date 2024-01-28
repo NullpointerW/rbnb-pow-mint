@@ -7,4 +7,11 @@ git clone
 go build 
 ```
 ## usage
-输入钱包地址并设置难度,当每个钱包打到4500时，会自动生产新的钱包继续挖掘，钱包私钥保存在目录下wal.txt下
+1. Configure the `.env` file.
+2. When each wallet reaches the specified limit, it will automatically generate a new wallet to continue mining. The wallet private keys are saved in the 'wal.txt' directory.
+
+
+
+
+
+

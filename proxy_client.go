@@ -13,3 +13,11 @@ func SSClient(cli *http.Client) *http.Client {
 	proxies.NewHttpClient(cli, dialer)
 	return cli
 }
+
+func SSClientYaml(cli *http.Client) *http.Client {
+	dialer, err := shadowsocks.NewDialerWithCfg(proxies.StringResolver, "ss.yaml")
+	if err != nil {
+		panic(err)
+	}
+	return proxies.NewHttpClient(cli, dialer)
+}

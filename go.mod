@@ -4,8 +4,9 @@ go 1.21
 
 require (
 	github.com/Dreamacro/clash v1.18.0
-	github.com/NullpointerW/ethereum-wallet-tool v1.3.2
+	github.com/NullpointerW/ethereum-wallet-tool v1.3.3
 	github.com/ethereum/go-ethereum v1.13.10
+	github.com/joho/godotenv v1.5.1
 	github.com/sirupsen/logrus v1.9.3
 )
 
@@ -26,4 +27,5 @@ require (
 	golang.org/x/sys v0.15.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/tools v0.15.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
